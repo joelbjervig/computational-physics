@@ -24,46 +24,35 @@ def trapz(f,a,b,n):
         
     return h*(0.5*(f(a)+f(b))+k)
 
-def simpsons(f,a,b,n):
+def simpsons(f,a,b,N):
     
-    h=(b-a)/n
+    h=(b-a)/N
     k=0.0
     
     x=a+h
-    for i in range(1,int(n/2+1)):
+    for i in range(1,int(N/2+1)):
         x += 2*h
         k += 4*f(x)
         
     x = a+2*h
-    for i in range(2,int((n/2)-1)):
+    for i in range(2,int((N/2)-1)):
         x += 2*h
         k += 2*f(x)
 
     return (h/3)*(f(a)+f(b)+k)
 
-def bode(f,a,b,n):
-    
-    h=(b-a)/n
-    k=0.0
-    
-    x=a+h
-    for i in range(1,int(n/2+1)):
-        k += 32*f(x)
-        x += 2*h 
-    x = a+2*h
-    for i in range(2,int(n/4)):
-        x += 4*h
-        k += 12*f(x)
-    x = a
-    for i in range(a,int(n/4)):
-        if (x==a or x==b):
-            k += 7*f(x)
-        else:
-            k += 14*f(x)
-        x += 4*h
 
-        
-    return (2*h/45)*k
+def bode(f,a,b,N):
+    h = (b-a)/N
+
+    vector = np.arange(a,b-h,4*h)
+    # print(vector)
+    sum = 0
+    
+    for x in vector:
+        sum = sum + 2*h/45*(7*f(x) + 32*f(x+h) + 12*f(x+2*h)+ 32*f(x+3*h) + 7*f(x+4*h))
+    return sum
+
 
 
 a = 0
