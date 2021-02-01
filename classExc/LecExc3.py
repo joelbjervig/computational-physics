@@ -36,10 +36,11 @@ def newtonraphson(f,df,x0,root,accu,max_iter):
         fxn = f(xn)
         Dfxn = df(xn)
         
-        
         print('Error Value:', root-xn)
+        if abs(abs(fxn) < accu):
+            print('Found solution after',n,'iterations.')
+            return x0
         
-
         if Dfxn == 0:
             Dfxn = accu;
             
@@ -79,6 +80,6 @@ eps = 10**-10       # precission
 max_iter = 100      # max iteration
 root = m.sqrt(5)    # positive root
 
-#newtonraphson(f,df,x0,root,eps,max_iter)
-#search(f,x0,dx,eps)
+newtonraphson(f,df,x0,root,eps,max_iter)
+search(f,x0,dx,eps)
 secant(f,x0,x1,root,eps,max_iter)
