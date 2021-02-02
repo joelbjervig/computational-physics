@@ -34,7 +34,7 @@ y = lambda x:exp(-x*x/2)
 # grid
 a=0
 b=1
-N=np.arange(1,1000,3)
+N=np.arange(1,1000,10)
 H=(b-a)/N
 
 for i in range(len(N)):

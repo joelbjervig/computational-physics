@@ -30,7 +30,7 @@ def implicit(g,y0,x):
     return y
 
 
-N=np.arange(1,1000,3)
+N=np.arange(1,1000,10)
 eul=np.zeros(N.shape)
 tayl=np.zeros(N.shape)
 imp=np.zeros(N.shape)
@@ -38,7 +38,7 @@ imp=np.zeros(N.shape)
 a=0
 b=1
 f= lambda x,y:-x*y
-y= lambda x:exp(-x*x/2)
+y = lambda x:exp(-x*x/2)
 y0=1
 
 dfx = lambda x,y:-y
