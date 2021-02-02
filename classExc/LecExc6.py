@@ -90,3 +90,14 @@ for i in range(len(N)):
 
     
 >>>>>>> db36b9a6f11447fa65e2c889ce67d55192e538eb
+
+def rk3(f,y0,x):
+    y=np.zeros(x.shape)
+    y[0]=y0
+    for i in range(1,len(y)):
+        h=x[i]-x[i-1]
+        k1=h*f(x[i-1],y[i-1])
+        k2=h*f(x[i-1]+h/2,y[i-1]+k1/2)
+        k3=h*f(x[i-1]+h,y[i-1]-k1+2*k2)
+        y[i]=y[i-1]+(k1+4*k2+k3)/6
+    return y
