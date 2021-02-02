@@ -28,8 +28,9 @@ def implicit(g,y0,x):
         h=x[i]-x[i-1]
         y[i]=y[i-1]*(1+0.5*g(x[i-1])*h)/(1-0.5*g(x[i])*h)
     return y
-    
-    N=np.arange(1,1000,3)
+
+
+N=np.arange(1,1000,3)
 eul=np.zeros(N.shape)
 tayl=np.zeros(N.shape)
 imp=np.zeros(N.shape)
