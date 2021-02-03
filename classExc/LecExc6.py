@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from math import *
 
+# Runge-Kutta 2nd order
 def RK2(f, x, y0):
     y=np.zeros(x.shape)
     y[0] = y0
@@ -23,6 +24,19 @@ def RK2(f, x, y0):
         
     return y
 
+# Runge-Kutta 3rd order
+def rk3(f,y0,x):
+    y=np.zeros(x.shape)
+    y[0]=y0
+    for i in range(1,len(y)):
+        h=x[i]-x[i-1]
+        k1=h*f(x[i-1],y[i-1])
+        k2=h*f(x[i-1]+h/2,y[i-1]+k1/2)
+        k3=h*f(x[i-1]+h,y[i-1]-k1+2*k2)
+        y[i]=y[i-1]+(k1+4*k2+k3)/6
+    return y
+
+# Runge-Kutta 4th order
 def RK4(f, x, y0):
     y = np.zeros(x.shape)
     y[0] = y0
@@ -40,7 +54,7 @@ def RK4(f, x, y0):
         
     return y
 
-# functions
+# functions definition
 f   = lambda x,y:-x*y           
 dfx = lambda x,y:-y             #df/dx
 dfy = lambda x,y:-x             #df/dy
@@ -72,7 +86,7 @@ plt.figure(1)
 plt.xlabel("Size of interval h")
 plt.ylabel("Error")
 plt.loglog(H,abs(rk2-y_true(b)),label="RK2")
-#plt.plot(H,abs(rk3-y_true(b)),label="RK3")
+plt.plot(H,abs(rk3-y_true(b)),label="RK3")
 plt.loglog(H,abs(rk4-y_true(b)),label="RK4")
 plt.legend()
 plt.show()
@@ -89,8 +103,6 @@ for i in range(len(N)):
     x=np.linspace(a,b,N[i])
     
     rk2[i] = RK2(f,x,y0)[-1]
-    #rk3[i] = RK3(f,x,y0)[-1]
+    rk3[i] = RK3(f,x,y0)[-1]
     rk4[i] = RK4(f,x,y0)[-1] # why the [-1]? /joel
-
-
 
