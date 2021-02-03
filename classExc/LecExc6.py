@@ -12,27 +12,30 @@ from math import *
 
 # Runge-Kutta 2nd order
 def RK2(f, x, y0):
-    y=np.zeros(x.shape)
+    y = np.zeros(x.shape)
     y[0] = y0
     
-    for i in range( len(x) - 1 ):
-        H = x[i+1] - x[i]
+    for i in range(len(x) - 1):
+        h = x[i+1] - x[i]
         
-        k = H*f(y[i], x[i])
+        k = h*f(y[i], x[i])
         
-        y[i+1] = y[i] + H*f(x[i]+H/2, y[i]+k/2)
+        y[i+1] = y[i] + h*f(x[i]+H/2, y[i]+k/2)
         
     return y
 
 # Runge-Kutta 3rd order
-def rk3(f,y0,x):
-    y=np.zeros(x.shape)
-    y[0]=y0
+def RK3(f, x, y0):
+    y = np.zeros(x.shape)
+    y[0] = y0
+    
     for i in range(1,len(y)):
-        h=x[i]-x[i-1]
-        k1=h*f(x[i-1],y[i-1])
-        k2=h*f(x[i-1]+h/2,y[i-1]+k1/2)
-        k3=h*f(x[i-1]+h,y[i-1]-k1+2*k2)
+        h = x[i]-x[i-1]
+        
+        k1 = h*f(x[i-1],    y[i-1])
+        k2 = h*f(x[i-1]+h/2,y[i-1]+k1/2)
+        k3 = h*f(x[i-1]+h,  y[i-1]-k1+2*k2)
+        
         y[i]=y[i-1]+(k1+4*k2+k3)/6
     return y
 
@@ -41,14 +44,13 @@ def RK4(f, x, y0):
     y = np.zeros(x.shape)
     y[0] = y0
     
-    #H = x[1]-x[0] # could move into for loop as 
     for i in range(len(x)-1):
-        H=x[i+1]-x[i]
+        h = x[i+1]-x[i]
         
-        k1 = H*f(x[i],y[i])
-        k2 = H*f(x[i]+0.5*H  ,y[i]+0.5*k1)
-        k3 = H*f(x[i]+0.5*H  ,y[i]+0.5*k2)
-        k4 = H*f(x[i]+    H  ,y[i]    +k3)
+        k1 = h*f(x[i],y[i])
+        k2 = h*f(x[i]+0.5*h  ,y[i]+0.5*k1)
+        k3 = h*f(x[i]+0.5*h  ,y[i]+0.5*k2)
+        k4 = h*f(x[i]+    h  ,y[i]    +k3)
     
         y[i+1] = y[i]+(1/6)*(k1+2*k2+2*k3+k4)
         
@@ -74,10 +76,10 @@ rk4 = np.zeros(N.shape)
 
 # iterate through number of intervals. Q: how does error change with changing N (H)
 for i in range(len(N)):
-    x=np.linspace(a,b,N[i])
+    x = np.linspace(a,b,N[i])
     
     rk2[i] = RK2(f,x,y0)[-1] # why the [-1]? /joel
-    #rk3[i] = RK4(f,x,y0)[-1]
+    rk3[i] = RK3(f,x,y0)[-1]
     rk4[i] = RK4(f,x,y0)[-1]
 
 
@@ -86,7 +88,7 @@ plt.figure(1)
 plt.xlabel("Size of interval h")
 plt.ylabel("Error")
 plt.loglog(H,abs(rk2-y_true(b)),label="RK2")
-plt.plot(H,abs(rk3-y_true(b)),label="RK3")
+plt.loglog(H,abs(rk3-y_true(b)),label="RK3")
 plt.loglog(H,abs(rk4-y_true(b)),label="RK4")
 plt.legend()
 plt.show()
