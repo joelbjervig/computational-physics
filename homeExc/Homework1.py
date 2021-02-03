@@ -8,17 +8,9 @@ Created on Wed Feb  3 10:01:20 2021
 import numpy as np
 from math import *
 import matplotlib.pyplot as plt
-from library import RK2
-from library import RK3
-from library import RK4
+from library import RK2_SYS
+from library import RK3_SYS
 from library import RK4_SYS
-
-
-
-
-
-
-
 
 
 # exacto solution of problem
@@ -38,9 +30,32 @@ N=np.arange(1,1000,10)  # num internals. Num points is N+1
 
 # initialize vectors
 t = np.linspace(a,b,N[99])
-y=RK4_SYS(f,g,y0,p0,t)[0]
-# y = np.zeros(N.shape)
-# p = np.zeros(N.shape)
+
+p2 = RK2_SYS(f,g,y0,p0,t)[0]
+y2 = RK2_SYS(f,g,y0,p0,t)[1]
+
+p3 = RK3_SYS(f,g,y0,p0,t)[0]
+y3 = RK3_SYS(f,g,y0,p0,t)[1]
+
+p4 = RK4_SYS(f,g,y0,p0,t)[0]
+y4 = RK4_SYS(f,g,y0,p0,t)[1]
+
+
+
+plt.figure(1)
+plt.xlabel("Time t")
+plt.ylabel("Amplitude")
+plt.plot(t,p2,label="RK2 momentum")
+plt.plot(t,y2,label="RK2 displacement")
+
+plt.plot(t,p3,label="RK3 momentum")
+plt.plot(t,y3,label="RK3 displacement")
+
+plt.plot(t,p4,label="RK4 momentum")
+plt.plot(t,y4,label="RK4 displacement")
+
+plt.legend()
+plt.show()
 
 # # iterate through number of intervals. Q: how does error change with changing N (H)
 # for i in range(len(N)):

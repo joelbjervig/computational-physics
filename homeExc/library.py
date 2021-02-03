@@ -60,12 +60,59 @@ def RK4(f, x, y0):
         
     return y
 
+################################
+### RUNGE-KUTTA SYSYEM OF EQ ###
+################################
+
+# Runge-Kutta 2nd order for system of equations
+def RK2_SYS(f,g,y0,z0,x):
+    y = np.zeros(x.shape)
+    z = np.zeros(x.shape)
+    y[0] = y0
+    z[0] = z0
+    
+    for i in range(len(x) - 1):
+        h = x[i+1] - x[i]
+        
+        k1 = h*f(x[i],y[i],z[i])
+        l1 = h*g(x[i],y[i],z[i])
+        
+        y[i+1] = y[i]+k1
+        z[i+1] = z[i]+l1
+        
+    return y,z
+
+# Runge-Kutta 3rd order for system of equations
+def RK3_SYS(f,g,y0,z0,x):
+    y = np.zeros(x.shape)
+    z = np.zeros(x.shape)
+    y[0] = y0
+    z[0] = z0
+    
+    for i in range(len(x)-1):
+        h = x[i]-x[i-1]
+        
+        k1 = h*f(x[i],y[i],z[i])
+        l1 = h*g(x[i],y[i],z[i])
+        
+        k2 = h*f(x[i]+h/2,y[i]+k1/2,z[i]+l1/2)
+        l2 = h*g(x[i]+h/2,y[i]+k1/2,z[i]+l1/2)
+        
+        k3 = h*f(x[i]+h,y[i]-k1+2*k2,z[i]-l1+2*l2)
+        l3 = h*g(x[i]+h,y[i]-k1+2*k2,z[i]-l1+2*l2)
+        
+        k = (k1+4*k2+k3)/6
+        l = (l1+4*l2+l3)/6
+
+        y[i+1] = y[i] + k
+        z[i+1] = z[i] + l
+    return y,z
 
 # Runge-Kutta 4th order for system of equations
 def RK4_SYS(f,g,y0,z0,x):
     y = np.zeros(x.shape)
-    y[0] = y0
     z = np.zeros(x.shape)
+    y[0] = y0
     z[0] = z0
     
     for i in range(len(x)-1):
@@ -91,10 +138,6 @@ def RK4_SYS(f,g,y0,z0,x):
         
     return y,z
         
-        
-        
-
-
 
 ###############################
 ###### OTHER ODE SOLVERS ######
