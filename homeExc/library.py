@@ -33,14 +33,14 @@ def RK3(f, x, y0):
     y = np.zeros(x.shape)
     y[0] = y0
     
-    for i in range(1,len(y)):
-        h = x[i]-x[i-1]
+    for i in range(len(x)-1):
+        h = x[i+1]-x[i]
         
-        k1 = h*f(x[i-1],    y[i-1])
-        k2 = h*f(x[i-1]+h/2,y[i-1]+k1/2)
-        k3 = h*f(x[i-1]+h,  y[i-1]-k1+2*k2)
+        k1 = h*f(x[i],y[i])
+        k2 = h*f(x[i]+h/2,y[i]+k1/2)
+        k3 = h*f(x[i]+h,  y[i]-k1+2*k2)
         
-        y[i]=y[i-1]+(k1+4*k2+k3)/6
+        y[i+1]=y[i]+(k1+4*k2+k3)/6
     return y
 
 # Runge-Kutta 4th order
@@ -52,13 +52,15 @@ def RK4(f, x, y0):
         h = x[i+1]-x[i]
         
         k1 = h*f(x[i],y[i])
-        k2 = h*f(x[i]+0.5*h  ,y[i]+0.5*k1)
-        k3 = h*f(x[i]+0.5*h  ,y[i]+0.5*k2)
-        k4 = h*f(x[i]+    h  ,y[i]    +k3)
+        k2 = h*f(x[i]+h/2,y[i]+k1/2)
+        k3 = h*f(x[i]+h/2,y[i]+k2/2)
+        k4 = h*f(x[i]+h,y[i]+k3)
     
         y[i+1] = y[i]+(1/6)*(k1+2*k2+2*k3+k4)
         
     return y
+
+
 
 ################################
 ### RUNGE-KUTTA SYSYEM OF EQ ###
@@ -90,7 +92,7 @@ def RK3_SYS(f,g,y0,z0,x):
     z[0] = z0
     
     for i in range(len(x)-1):
-        h = x[i]-x[i-1]
+        h = x[i+1] - x[i]
         
         k1 = h*f(x[i],y[i],z[i])
         l1 = h*g(x[i],y[i],z[i])
@@ -101,8 +103,8 @@ def RK3_SYS(f,g,y0,z0,x):
         k3 = h*f(x[i]+h,y[i]-k1+2*k2,z[i]-l1+2*l2)
         l3 = h*g(x[i]+h,y[i]-k1+2*k2,z[i]-l1+2*l2)
         
-        k = (k1+4*k2+k3)/6
-        l = (l1+4*l2+l3)/6
+        k = (k1 + 4*k2 + k3)/6
+        l = (l1 + 4*l2 + l3)/6
 
         y[i+1] = y[i] + k
         z[i+1] = z[i] + l
@@ -133,8 +135,8 @@ def RK4_SYS(f,g,y0,z0,x):
         k = 1/6*(k1 + 2*k2 + 2*k3 + k4)
         l = 1/6*(l1 + 2*l2 + 2*l3 + l4)
         
-        y[i+1] = y[i]+k
-        z[i+1] = z[i]+l
+        y[i+1] = y[i] + k
+        z[i+1] = z[i] + l
         
     return y,z
         
