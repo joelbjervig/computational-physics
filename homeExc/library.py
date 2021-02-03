@@ -24,7 +24,7 @@ def RK2(f, x, y0):
         
         k = h*f(y[i], x[i])
         
-        y[i+1] = y[i] + h*f(x[i]+H/2, y[i]+k/2)
+        y[i+1] = y[i] + h*f(x[i]+h/2, y[i]+k/2)
         
     return y
 
