@@ -172,6 +172,28 @@ def implicit(g,y0,x):
         y[i-1]=y[i]*(1+0.5*g(x[i])*h)/(1-0.5*g(x[i-1])*h)
     return y
 
+
+###############################
+##### 2ND ORDER DE SOLVER #####
+###############################
+
+# Solves DE of form d^2y/dx^2 + k^2(x)y = S(x)
+# numerov without k^2
+def numerov(k,S,y0,y1,x):
+    y=np.zeros(x.shape)
+    
+    for i in range(1,len(x)+1):
+        h=x[i]-x[i-1]
+    
+        a = -2*(1-5/12*h**2*)k(n)**2    # for y[n]
+        b = 1+h**2/12*k[n-1]**2         # for y[n-1]
+        c = 1+h**2/12*k(n+1)**2         # for y[n+1]
+    
+        y[n+1] = (a*y[n] + b*y[n-1])/c  # solve for 
+        
+    return y
+
+
 ###############################
 ######### ROOT FINDING ########
 ###############################
