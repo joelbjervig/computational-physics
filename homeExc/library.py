@@ -215,7 +215,7 @@ def search(f,x0,dx,accu):   # guess trial value smaller than solution
         n+=1            # increace iteration counter
         
     print('Found solution after',n,'iterations.')
-    return x0
+    return x0,dx
 
 def newtonraphson(f,df,x0,root,accu,max_iter):
     xn = x0 
@@ -262,7 +262,7 @@ def secant(f,x0,x1,root,accu,max_iter):
     return None
 
 ###############################
-######### ROOT FINDING ########
+########### INTEGRAL ##########
 ###############################
 
 
