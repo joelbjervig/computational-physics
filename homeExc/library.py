@@ -178,7 +178,7 @@ def implicit(g,y0,x):
 ###############################
 
 # Solves DE of form d^2y/dx^2 + k^2(x)y = S(x)
-# numerov without k^2
+
 def numerov(k,S,y0,y1,x):
     y=np.zeros(x.shape)
     
