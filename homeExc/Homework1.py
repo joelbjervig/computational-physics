@@ -13,10 +13,6 @@ from library import RK2_SYS
 from library import RK3_SYS
 from library import RK4_SYS
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-
-
 # exacto solution of problem
 c1 = 0; # corresponds to 
 c2 = 1/(2*pi); # y0 and p0
@@ -25,6 +21,8 @@ p_exact = lambda t: c2*2*pi*np.cos(2*pi*t)- 2*pi*c1*np.sin(2*pi*t)
 y_exact = lambda t: c1*np.cos(2*pi*t) + c2*np.sin(2*pi*t)
 
 # ODE
+quad = lambda x:x**4
+dual = lambda x:x
 f = lambda t,y,p:p
 g = lambda t,y,p: -4*pi**2*y
 y0=0    # initial condition just trying omething
@@ -52,7 +50,7 @@ y4,p4 = RK4_SYS(f,g,y0,p0,t)
 y_true = y_exact(t);
 p_true = p_exact(t);
 
-
+"""
 print("l = %1.3f" %l)
 print("u = %1.3f" %u)
 print("p = %1.3f" %p)
@@ -84,19 +82,24 @@ plt.plot(t,y4,label="RK4: Displacement")
 plt.plot(t,p4,label="RK4: Momentum")
 plt.legend()
 plt.show()
-
-y4h = np.zeros((len(N), len(t)))
-p4h = np.zeros((len(N), len(t)))
+"""
+y4h = np.zeros(N.shape)
+p4h = np.zeros(N.shape)
 
 # iterate through number of intervals. Q: how does error change with changing N (H)
 for i in range(len(N)):
     t = np.linspace(a,b,N[i])
 
-    y4h[i] = RK4_SYS(f,g,y0,p0,t)[0]
-    p4h[i] = RK4_SYS(f,g,y0,p0,t)[1]
+    y4h[i] = RK4_SYS(f,g,y0,p0,t)[0][-1]
+    p4h[i] = RK4_SYS(f,g,y0,p0,t)[1][-1]
     
     
-"""
+print(H.shape)
+print(y4h.shape)
+print(p4h.shape)
+print(y4h)
+print(p4h)
+
 # plot abs of errors
 plt.figure(1)
 plt.title("Error of RK4 method: limits a = {a}, b = {b}π,. Number of intervals: Min: I_min = {l}, max: I_max = {u}, num partitions p = {p}".format(a= a, b = int(b/pi), l = l, u = u, p = p))
@@ -104,14 +107,10 @@ plt.xlabel("Size of interval h")
 plt.ylabel("Error")
 plt.loglog(H,abs(y4h-y_exact(b)),label="Displacement")
 plt.loglog(H,abs(p4h-p_exact(b)),label="Momentum")
+plt.loglog(H,quad(H),label="y=x^4")
+plt.loglog(H,dual(H),label="y=x^2")
 plt.legend()
 plt.show()
-"""
-
-H, t = np.meshgrid(H, t)
-surf = ax.plot_surface(H,t,abs(y4h-y_exact(t)))#, cmap=cm.coolwarm, linewidth=0, antialiased=False)
-
-
 
 
 
