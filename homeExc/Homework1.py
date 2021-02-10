@@ -32,7 +32,7 @@ N=np.arange(1,1000,10)  # num internals. Num points is N+1
 
 
 # initialize vectors
-t = np.linspace(a,b,N[50])
+t = np.linspace(a,b,N[99])
 
 p2 = RK2_SYS(f,g,y0,p0,t)[0]
 y2 = RK2_SYS(f,g,y0,p0,t)[1]
@@ -95,6 +95,17 @@ plt.plot(t,abs(y2-y_true),label="Displacement y")
 plt.legend()
 plt.show()
 
+plt.figure(5)
+plt.title("True values and rk4 solutions")
+plt.xlabel("Time t")
+plt.ylabel("Amplitude")
+plt.plot(t,p_true,label="Momentum p_true")
+plt.plot(t,y_true,label="Displacement y_ture")
+plt.plot(t,p4,label="Momentum p4")
+plt.plot(t,y4,label="Displacement y4")
+plt.legend()
+plt.show()
+
 plt.figure(6)
 plt.title("Error using Runge-Kutta of order 3")
 plt.xlabel("Time t")
@@ -108,8 +119,8 @@ plt.figure(7)
 plt.title("Error using Runge-Kutta of order 4")
 plt.xlabel("Time t")
 plt.ylabel("Amplitude")
-plt.plot(t,abs(p4-p_true),label="Momentum p")
-plt.plot(t,abs(y4-y_true),label="Displacement y")
+plt.plot(t,abs(y4-p_true),label="Momentum p")
+plt.plot(t,abs(p4-y_true),label="Displacement y")
 plt.legend()
 plt.show()
 
