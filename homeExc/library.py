@@ -306,3 +306,26 @@ def bode(f,a,b,N):
     for x in vector:
         sum = sum + 2*h/45*(7*f(x) + 32*f(x+h) + 12*f(x+2*h)+ 32*f(x+3*h) + 7*f(x+4*h))
     return sum
+
+
+###############################
+##### Legendre Polynomial #####
+###############################
+
+# Legendre polynomial 
+def P(x,n):  
+    if(n == 0): 
+        return 1 # P0 = 1 
+    elif(n == 1): 
+        return x # P1 = x 
+    else: 
+        return ((2*n-1)*x*P(x, n-1)-(n-1)*P(x, n-2))/(n)
+
+# Derivative of Legendre Polynomial
+def P_prime(x,n):
+    if(n==0):
+        return 0
+    elif(n==1):
+        return 1
+    else:
+        return (-n*x*P(x,n)+n*P(x,n-1))/(1-x**2)
