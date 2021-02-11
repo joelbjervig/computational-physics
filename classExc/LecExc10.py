@@ -34,26 +34,34 @@ def bissection(a,b,f,maxit):
         return None
     c=(a+b)/2
     for i in range(maxit):
-        if f(c)*f(a)<=0:
+        c=(a+b)/2
+        if f(c)*f(a)<0:
             b=c
-        elif f(c)*f(b)<=0:
+        elif f(c)*f(b)<0:
             a=c
-        elif f(c)==0:
+        elif f(c)==0.0:
             print("Exact solution found.")
             return c
     return (a+b)/2
 
-#finds the number of roots given for a function by splitting an interval
 def multipleroots(a,b,f,numroots):
-    for scale in range(10,100,10):
+    for scale in range(10,1000,10):
         X=np.linspace(a,b,numroots*scale)
         x0=np.zeros((numroots,))
         j=0
         for i in range(1,len(X)):
-            if f(X[i-1])*f(X[i])<=0:
-                x0[j]=bissection(X[i-1],X[i],f,200)
+            if f(X[i-1])*f(X[i])<0:
+                x0[j]=bissection(X[i-1],X[i],f,1000)
                 j+=1
+            if f(X[i-1])*f(X[i]) ==0:
+                if f(X[i-1]) == 0:
+                    x0[j]=X[i-1]
+                    j+=1
+                else:
+                    x0[j]=X[i]
+                    j+=1
         if j==numroots:
+            print(scale)
             return x0
     print("Number of roots not consistent with function provided.")
     return None
@@ -80,5 +88,11 @@ plt.legend()
 plt.show()
 
 
+a=-1
+b=1
+numroots=3
 
+P3 = lambda x:P(x,3)
+roots=multipleroots(a,b,P3,3)
+print(roots)
 
