@@ -296,16 +296,17 @@ def simpsons(f,a,b,N):
     return (h/3)*(f(a)+f(b)+k)
 
 
-def bode(f,a,b,N):
-    h = (b-a)/N
-
-    vector = np.arange(a,b-h,4*h)
-    # print(vector)
-    sum = 0
-    
-    for x in vector:
-        sum = sum + 2*h/45*(7*f(x) + 32*f(x+h) + 12*f(x+2*h)+ 32*f(x+3*h) + 7*f(x+4*h))
-    return sum
+def bode(a,b,N,f):
+    if N%4 != 0:
+        print("N is not a multiple of 4")
+        return None
+    s=0
+    h=(b-a)/N
+    for i in range(0,N,4):
+        integ=(7*f(a+i*h)+32*f(a+(i+1)*h)+12*f(a+(i+2)*h)+32*f(a+(i+3)*h)+7*f(a+(i+4)*h))
+        integ*=(2*h)/45
+        s+=integ
+    return s
 
 
 ###############################
