@@ -5,7 +5,7 @@ Created on Fri Feb 12 09:37:12 2021
 
 @author: joelbjervig
 """
-
+import time
 import numpy as np
 from math import *
 import matplotlib.pyplot as plt
@@ -36,16 +36,34 @@ r = np.linspace(0,r_max,N)
 phi = np.zeros(r.shape)
 phi_t = phi_true(r)
 
-for i in range(len(r)):
+phi_0 = 0
+phi_inf = 0
+phi[0] = phi_0
+phi[-1] = phi_inf
+
+start = time.process_time()     # meassures time taken to loop
+for i in range(1,len(r)-1):
     phi[i] = phi_GT(r[i])*bode(0,r[i],N,phi_LTS) + phi_LT(r[i])*bode(r[i],r_max,N,phi_GTS) # N or n? and are the bounds 0 ro r?
-    
+print(time.process_time() - start)
 
 plt.figure(1)
-plt.title("error")
-plt.xlabel("Amplitude")
-plt.ylabel("r")
-plt.plot(r,abs(phi-phi_t),label="error ye")
-
+plt.title("Deviation from analytical solution")
+plt.xlabel("r")
+plt.ylabel("Amplitude")
+plt.plot(r,abs(phi-phi_true(r)))
 
 plt.legend()
 plt.show()
+
+"""
+print(r)
+plt.figure(2)
+plt.title("Solutions to the homogenous problem")
+plt.xlabel("r")
+plt.ylabel("Amplitude")
+plt.plot(r, phi_GT(r), label="PHI_>")
+plt.plot(r, phi_LT(r), label="PHI_<")
+
+plt.legend()
+plt.show()
+"""
