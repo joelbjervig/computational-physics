@@ -1,0 +1,78 @@
+import time
+import numpy as np
+from math import *
+import matplotlib.pyplot as plt
+
+#calculate integrals between for sets of 5 points
+def bode(a,b,N,f):
+    if (N-1)%4 != 0:
+        print("N is not a multiple of the form 4p+1")
+        return None
+    s=0
+    h=(b-a)/N
+    for i in range(0,N,4):
+        integ=(7*f(a+i*h)+32*f(a+(i+1)*h)+12*f(a+(i+2)*h)+32*f(a+(i+3)*h)+7*f(a+(i+4)*h))
+        integ*=(2*h)/45
+        s+=integ
+    return s
+
+
+a=4
+
+#phi functions "greater than" and "less than" r_m
+phi_GT  = lambda r: -1/sqrt(2*a)*(np.exp(-a*r))
+phi_LT  = lambda r: 1/sqrt(2*a)*(np.exp(a*r)-np.exp(-a*r))
+#source term
+S       = lambda r: -1/2*r*np.exp(-r)
+#multiplictions of S and phi in the integration
+multipLT = lambda x:phi_LT(x)*S(x)
+multipGT = lambda x:phi_GT(x)*S(x)
+
+#analytical solution
+phi_true = lambda r : (1/(1-a**2)**2)*(np.exp(-a*r)-np.exp(-r)*(1+0.5*(1-a**2)*r))
+
+r0=0
+rmax=30
+
+#number of points on which phi is computed
+n=200
+#scale used to get a finer mesh for the integration interval on each sides of r_m
+scale=30
+
+#initialisation
+r=np.linspace(r0,rmax,n)
+phi=np.zeros((n,))
+phi[0],phi[-1]=0,0
+
+start = time.process_time()     # meassures time taken to loop
+
+#loop avoiding the boundaries for which we have input values
+for i in range(1,n-1):
+    #creating intervals on which we'll integrat on each side of r_m
+    #adaptative sizes on each side depending on where we are on the r array
+    rm=r[i]
+    r_LT=np.linspace(r0,rm,scale*4*i+1)
+    r_GT=np.linspace(rm,rmax,scale*4*(n-i)+1)
+    #calculation of phi(r_m)
+    phi[i] = phi_GT(rm)*bode(r0,rm,len(r_LT),multipLT) + phi_LT(rm)*bode(rm,rmax,len(r_GT),multipGT)
+    
+print(time.process_time() - start)
+
+plt.figure(1)
+plt.title("Functions: a=4, n=200, scale=30")
+plt.xlabel("r")
+plt.ylabel("Amplitude")
+plt.plot(r,phi,label="numerical")
+plt.plot(r,phi_true(r),label="analytical")
+plt.legend()
+plt.savefig('numerical_vs_analytical_thomas.png')
+plt.show()
+
+plt.figure(2)
+plt.title("Error: a=4, n=200, scale=30")
+plt.xlabel("r")
+plt.ylabel("Error")
+plt.plot(r,abs(phi-phi_true(r)),label="solution")
+plt.legend()
+plt.savefig('error_thomas.png')
+plt.show()
