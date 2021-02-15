@@ -35,9 +35,10 @@ r0=0
 rmax=30
 
 #number of points on which phi is computed
-n=200
+n=100
+
 #scale used to get a finer mesh for the integration interval on each sides of r_m
-scale=30
+scale=1
 
 #initialisation
 r=np.linspace(r0,rmax,n)
