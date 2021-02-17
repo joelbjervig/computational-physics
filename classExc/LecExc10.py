@@ -27,7 +27,7 @@ def P_prime(x,n):
     else:
         return (-n*x*P(x,n)+n*P(x,n-1))/(1-x**2)
     
-#bissection function finding one root in one specific interval
+# Bissection function finding one root in one specific interval
 def bissection(a,b,f,maxit):
     if f(a)*f(b) >= 0:
         print("Doesn't change sign on interval")
@@ -44,6 +44,7 @@ def bissection(a,b,f,maxit):
             return c
     return (a+b)/2
 
+# Finding multiple roots
 def multipleroots(a,b,f,numroots):
     for scale in range(10,1000,10):
         X=np.linspace(a,b,numroots*scale)

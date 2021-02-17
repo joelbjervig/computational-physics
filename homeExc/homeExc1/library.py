@@ -349,7 +349,7 @@ def simpsons2(f, a, b, n):
     return (h/3)*(f(a)+f(b)+k)
 
 
-def bode(a,b,N,f):
+def bode(f,a,b,N):
     if N%4 != 0:
         print("N is not a multiple of 4")
         return None
