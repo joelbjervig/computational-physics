@@ -295,6 +295,20 @@ def simpsons(f,a,b,N):
 
     return (h/3)*(f(a)+f(b)+k)
 
+def simpsons2(f, a, b, n):
+    h=(b-a)/n
+    k=0.0
+    x=a + h
+    for i in range(1,int(n/2) + 1):
+        k += 4*f(x)
+        x += 2*h
+
+    x = a + 2*h
+    for i in range(1,int(n/2)):
+        k += 2*f(x)
+        x += 2*h
+    return (h/3)*(f(a)+f(b)+k)
+
 
 def bode(a,b,N,f):
     if N%4 != 0:
