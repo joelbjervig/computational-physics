@@ -11,7 +11,7 @@ from math import *
 import matplotlib.pyplot as plt
 
 import sys
-sys.path.insert(1, '/Users/joelbjervig/documents/universitet/kurser/pagaende/computational physics/computational-physics/homeExc/homeExc1')
+sys.path.insert(1, '/Users/joelbjervig/documents/universitet/kurser/pagaende/computational physics/computational-physics/homeExc')
 
 from library import bode
 

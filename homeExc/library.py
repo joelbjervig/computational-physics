@@ -350,16 +350,27 @@ def simpsons2(f, a, b, n):
 
 
 def bode(f,a,b,N):
-    if N%4 != 0:
-        print("N is not a multiple of 4")
+    if (N-1)%4 != 0:
+        print("N is not a multiple of the form 4p+1")
         return None
     s=0
     h=(b-a)/N
-    for i in range(0,N,4):
+    for i in range(0,N-3,4):
         integ=(7*f(a+i*h)+32*f(a+(i+1)*h)+12*f(a+(i+2)*h)+32*f(a+(i+3)*h)+7*f(a+(i+4)*h))
         integ*=(2*h)/45
         s+=integ
     return s
+
+def gausslegendre(f,N):
+    PN= lambda x:P(x,N)
+    weight = lambda x,N:2*(1-x**2)/((N+1)**2*(P(x,N+1))**2)
+    
+    roots=multipleroots(-1,1,PN,N)
+    
+    I=0
+    for xn in roots:
+        I+=weight(xn,N)*f(xn)
+    return I
 
 
 ###############################
