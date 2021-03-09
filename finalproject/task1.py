@@ -1,80 +1,79 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Mar  3 16:48:07 2021
-
-@author: joelbjervig
-"""
-
-import time
 import numpy as np
-from math import *
+import math
 import matplotlib.pyplot as plt
 
-import sys
-sys.path.insert(1, '/Users/joelbjervig/documents/universitet/kurser/pagaende/computational physics/computational-physics/homeExc')
+
+    
+def bode(f,a,b,N):
+    if (N-1)%4 != 0:
+        print("N is not a multiple of the form 4p+1")
+        return None
+    s=0
+    h=(b-a)/N
+    for i in range(0,N-3,4):
+        integ=(7*f(a+i*h)+32*f(a+(i+1)*h)+12*f(a+(i+2)*h)+32*f(a+(i+3)*h)+7*f(a+(i+4)*h))
+        integ*=(2*h)/45
+        s+=integ
+    return s
+
+
 
 from library import bode
 
 
-# constants
-V = 3
-E = 4
-a = 10
-r_max = 3*a
-b = np.arange(0,r_max/2-1,0.1) # so arcsin wont let b go up to r_max, only b<r_max/2
-r_min = b*np.sqrt(1-V/E)
+# def real(b):
+#     retrun 2*(np.arcsin(b/rmax) -np.pi/2-np.arccos(b/rmax*np.sqrt(E/(E-V))))
 
-print(r_min)
-
-# PROBLEMS: some values are not accepted in sqrt and in "true_divide". need to figure out range?
-# first integrand term for b<r<r_max
-
-
-theta1 = lambda r: (1/r**(2)*1/np.sqrt((1-b**2/r**2)))
-# second integrand term for r_min<r<r_max
-theta2 = lambda r: (1/r**(2)*1/np.sqrt((1-b**2/r**2)))
-
-#theta2 = lambda r: 1/r**(-2)*1/((1-(b**2/r**2)-V/E))**(0.5)
-
-N = 401
 
 def theta(b,rmax,rmin):
-    return 2*b*np.subtract(bode(theta1,b+1e-5,rmax,N), bode(theta2,rmin+1e-5,rmax,N))
-    #return 2*b*np.subtract(bode(theta1,b+1e-5,rmax,N), bode(theta2,rmin+1e-5,rmax,N))
-
-print(theta(b,r_max,r_min))
-#r = np.arange(0.01,10,0.01)
+    return np.subtract(bode(theta1,b+1e-5,rmax,N), bode(theta2,rmin+1e-5,rmax,N))
 
 
+N=100001 # 
+E=2 # 
+V=1
+rmax=10
 
-"""
-# analytical solution integral
-anSol = lambda b: 2*( (np.arcsin(b/r_max*1/((1-V/E)**0.5)) - pi/2) - ( np.arcsin(b/r_max)-pi/2 ) )
+# first integrand term for b<r<r_max
+theta1 = lambda r: 2*b*(r**(-2)*1/(np.sqrt(1-b**2/r**2)))
+# second integrand term for r_min<r<r_max
+theta2 = lambda r: 2*b*(r**(-2)*1/(np.sqrt(1-b**2/r**2-V/E)))
+
+analytical = lambda b: 2*(np.arcsin(b/rmax) -np.pi/2-np.arccos(b/rmax*np.sqrt(E/(E-V))))
+
+def real(b):
+    return 2*(np.arccos(b/rmax)-np.arccos(b/rmax*(E/(E-V))**0.5))
+real=np.vectorize(real)
+
+bvec=np.linspace(0.1,rmax,20)
+rmin=bvec*np.sqrt(E/(E-V))
+its=len(rmin[rmin<rmax])
+bvec=bvec[0:its]
+rmin=rmin[0:its]
+
+sol=np.zeros(len(rmin))
+error=np.zeros(len(rmin))
+
+for i in range(0,its):
+    b = bvec[i]
+    sol[i] = theta(b,rmax,rmin[i])
+
+error=(abs(sol-real(bvec)))
 
 
 
 
-
-
-# plot analytical solution
-plt.figure(1)
-plt.xlabel("r")
-plt.ylabel("Theta")
-plt.plot(r,theta1(r)+theta2(r))
-
-plt.legend()
+plt.plot(bvec,real(bvec),label="Analytical solution",marker='o')
+plt.plot(bvec,sol,label="Bode method",marker='*')
+plt.xlabel("Impact paramenter b")
+plt.ylabel('Scattering angle [radians]')
+plt.legend(loc='best')
 plt.show()
-"""
 
-"""
-# plot analytical solution
-plt.figure(1)
-plt.title("Analytical solution")
-plt.xlabel("impact paramenter b")
-plt.ylabel("Theta")
-plt.plot(b,anSol(b))
 
-plt.legend()
+plt.figure()
+plt.plot(bvec,error,label="Error",marker='*')
+plt.xlabel("Impact parameter b")
+plt.ylabel('Error [radians]')
+plt.legend(loc='best')
 plt.show()
-"""
