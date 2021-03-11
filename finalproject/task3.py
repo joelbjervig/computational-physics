@@ -16,15 +16,15 @@ def initial(N):
 
 def H(latt,J):
     #vectorial computation of the S_alpha*S_beta for the closest neighbours
-    Sup = np.roll(latt, -1, axis=0)*latt
-    Sdown = np.roll(latt, 1, axis=0)*latt
-    Sleft = np.roll(latt, 1, axis=1)*latt
-    Sright = np.roll(latt, -1, axis=1)*latt
+    Sup = np.roll(latt, -1, axis=0)
+    Sdown = np.roll(latt, 1, axis=0)
+    Sleft = np.roll(latt, 1, axis=1)
+    Sright = np.roll(latt, -1, axis=1)
     
     sum_neighbours= Sup+Sdown+Sleft+Sright
     
-    H=-J*np.sum(sum_neighbours)/4
-    return H
+    H=-J*np.sum(sum_neighbours*latt)
+    return H/4
 
 def Energy(latt,k,l):
     N=latt.shape[0]
@@ -36,45 +36,40 @@ def metropolis(latt,T):
     Nx,Ny=latt.shape
     for i in range(Nx):
         for j in range(Ny):
-            k = np.random.randint(0,Nx)
-            l = np.random.randint(0,Ny)
+            dE=Energy(latt,i,j)
             
-            Ei=Energy(latt,k,l)
-            latt[k,l]*=-1
-            Ef=Energy(latt,k,l)
-            
-            dE=Ef-Ei
-            
-            if dE<0:
-                continue
+            if dE<=0:
+                latt[i,j]*=-1
+                
             else:
                 r=np.random.uniform(0,1)
                 if r<exp(-dE/(kb*T)):
-                    
-                    latt[k,l]*=-1
+                    latt[i,j]*=-1
     return latt
 
 def magnetization(latt):
-    return np.mean(latt)
+    return np.sum(latt)
+
 
 N=8
 J=1
 kb=1
-T=np.linspace(1.5,3,50)
+T=np.linspace(1.6,3.2,70)
 
-ite=100
+relax=100
 
 orderparam,Khi,Cb= np.zeros(T.shape),np.zeros(T.shape),np.zeros(T.shape)
 
 for n in range(len(T)):
     lattice= initial(N)
     
-    for i in range(ite):
+    for i in range(relax):
         metropolis(lattice,T[n])
+        
     for i in range(ite):
         absM=E=M=E2=M2=0
         
-        metropolis(lattice,T[n])
+        lattice = metropolis(lattice,T[n])
         ener = H(lattice,J)
         mag = magnetization(lattice)
         
@@ -84,8 +79,6 @@ for n in range(len(T)):
         E2+=ener**2
         M2+=mag**2
         
-    orderparam[n]=absM/norm #independant of the size of the lattice
-    Khi[n]=M2/ite - (M/ite)**2
-    Cb[n]=E2/ite - (E/ite)**2
-    
-    
+    orderparam[n]=absM/(N*N) 
+    Khi[n]=(M2/ite - (M/ite)**2)/T[n]
+    Cb[n]=(E2/ite - (E/ite)**2)/(kb*T[n]**2)
