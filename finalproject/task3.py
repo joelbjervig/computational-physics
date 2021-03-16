@@ -1,20 +1,30 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Mar  5 16:09:37 2021
-
-@author: joelbjervig
-"""
-
 import numpy as np
+from numpy.random import rand
 import matplotlib.pyplot as plt
-from math import *
+
+##############
+#Functions
+##############
 
 def initial(N):
     lattice = np.random.choice([-1,1],(N,N))
     return lattice
 
-def H(latt,J):
+
+def metropolis(latt,temp):
+    for i in range(N):
+        for j in range(N):
+             
+                neigh = latt[(i+1)%N,j] + latt[i,(j+1)%N] + latt[(i-1)%N,j] + latt[i,(j-1)%N]
+                dE = 2*latt[i,j]*neigh
+                if dE < 0:
+                    latt[i, j] *= -1
+                elif rand() < np.exp(-dE/(kb*temp)):
+                    latt[i, j] *= -1
+    return latt
+
+
+def energy(latt):
     #vectorial computation of the S_alpha*S_beta for the closest neighbours
     Sup = np.roll(latt, -1, axis=0)
     Sdown = np.roll(latt, 1, axis=0)
@@ -23,62 +33,97 @@ def H(latt,J):
     
     sum_neighbours= Sup+Sdown+Sleft+Sright
     
-    H=-J*np.sum(sum_neighbours*latt)
+    H=-np.sum(sum_neighbours*latt)
     return H/4
 
-def Energy(latt,k,l):
-    N=latt.shape[0]
-    s=latt[k,l]
-    neighb = latt[(k+1)%N,l] + latt[k,(l+1)%N] + latt[(k-1)%N,l] + latt[k,(l-1)%N]
-    return 2*neighb*s
 
-def metropolis(latt,T):
-    Nx,Ny=latt.shape
-    for i in range(Nx):
-        for j in range(Ny):
-            dE=Energy(latt,i,j)
-            
-            if dE<=0:
-                latt[i,j]*=-1
-                
-            else:
-                r=np.random.uniform(0,1)
-                if r<exp(-dE/(kb*T)):
-                    latt[i,j]*=-1
-    return latt
+def magnetization(config):
+    mag = np.sum(config)
+    return mag
 
-def magnetization(latt):
-    return np.sum(latt)
+################
+#Main Code
+###############
 
-
-N=8
-J=1
 kb=1
-T=np.linspace(1.6,3.2,70)
+J=1    
+N= 32       
+equilibrium = 300 
+sweeps = 300
 
-relax=100
+T= np.linspace(1, 5, 30); 
+E,M,Cb,Khi = np.zeros(T.shape), np.zeros(T.shape), np.zeros(T.shape), np.zeros(T.shape)
+#U=np.zeros((3,len(T)))
 
-orderparam,Khi,Cb= np.zeros(T.shape),np.zeros(T.shape),np.zeros(T.shape)
+norm1=sweeps*N**2
+norm2=sweeps**2*N**2
 
 for n in range(len(T)):
-    lattice= initial(N)
+    e1 = m1 = e2 = m2 = m4 =0
     
-    for i in range(relax):
-        metropolis(lattice,T[n])
+    config = initial(N)
+    
+    for i in range(equilibrium): #loops to equilibrate the system
+        metropolis(config, T[n]) #metropolis algorithm
+
+    for i in range(sweeps): 
+        metropolis(config, T[n])
         
-    for i in range(ite):
-        absM=E=M=E2=M2=0
+        En = energy(config) 
+        Mag = magnetization(config) 
+
+        e1+=En
+        m1+=Mag
+        m2+=Mag**2 
+        e2+=En**2
+        m4+=Mag**4
+
+    E[n] = e1/norm1
+    M[n] = m1/norm1
+    Cb[n] = (e2/norm1 - e1**2/norm2)/(kb*T[n]**2)
+    Khi[n] = (m2/norm1 - m1**2/norm2)/(kb*T[n])
+    Ul=1-m4/(norm1**4*3*m2**2/norm2)
+    if N==8:
+        U[0,n]=Ul
+    elif N==16:
+        U[1,n]=Ul
+    elif N==32:
+        U[2,n]=Ul
         
-        lattice = metropolis(lattice,T[n])
-        ener = H(lattice,J)
-        mag = magnetization(lattice)
         
-        absM+=abs(mag)
-        E+=ener
-        M+=mag
-        E2+=ener**2
-        M2+=mag**2
-        
-    orderparam[n]=absM/(N*N) 
-    Khi[n]=(M2/ite - (M/ite)**2)/T[n]
-    Cb[n]=(E2/ite - (E/ite)**2)/(kb*T[n]**2)
+##############
+#Plots
+##############
+
+
+plt.figure(1)
+plt.plot(T,abs(M),"co")
+plt.xlabel("Temperature (T)") 
+plt.ylabel("Order parameter")
+plt.title("N="+str(N)+", sweeps = equilibriate sweeps ="+str(sweeps))
+plt.savefig("Magnetization"+str(N)+".jpg")
+
+plt.figure(2)
+plt.plot(T,Khi,"bo")
+plt.xlabel("Temperature (T)") 
+plt.ylabel("Susceptibility (Khi)")
+plt.title("N="+str(N)+", sweeps = equilibriate sweeps ="+str(sweeps))
+plt.savefig("Susceptibility"+str(N)+".jpg")
+
+plt.figure(3)
+plt.plot(T,Cb,"ro")
+plt.xlabel("Temperature (T)") 
+plt.ylabel("Specific heat (Cb)")
+plt.title("N="+str(N)+", sweeps = equilibriate sweeps ="+str(sweeps))
+plt.savefig("Specheat"+str(N)+".jpg")
+
+
+plt.figure(4)
+plt.plot(T,U[0,:],"y-",label="N=8")
+plt.plot(T,U[1,:],"g-",label="N=16")
+plt.plot(T,U[2,:],"b-",label="N=32")
+plt.legend()
+plt.xlabel("Temperature (T)") 
+plt.ylabel("Fourth order cumulant (Ul)")
+
+
