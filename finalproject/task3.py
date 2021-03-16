@@ -12,6 +12,7 @@ def initial(N):
 
 
 def metropolis(latt,temp):
+    N=latt.shape[0]
     for i in range(N):
         for j in range(N):
              
@@ -41,89 +42,99 @@ def magnetization(config):
     mag = np.sum(config)
     return mag
 
+
 ################
 #Main Code
 ###############
 
-kb=1
-J=1    
-N= 32       
-equilibrium = 300 
-sweeps = 300
+def ising(N,T):
+    kb=1
+    J=1      
+    equilibrium = 1000 
+    sweeps = 1000
 
-T= np.linspace(1, 5, 30); 
-E,M,Cb,Khi = np.zeros(T.shape), np.zeros(T.shape), np.zeros(T.shape), np.zeros(T.shape)
-#U=np.zeros((3,len(T)))
-
-norm1=sweeps*N**2
-norm2=sweeps**2*N**2
-
-for n in range(len(T)):
-    e1 = m1 = e2 = m2 = m4 =0
+    E,M,Cb,Khi,U = np.zeros(T.shape), np.zeros(T.shape), np.zeros(T.shape), np.zeros(T.shape), np.zeros(T.shape)
     
-    config = initial(N)
+
+    norm1=sweeps*N**2
+    norm2=sweeps**2*N**2
+
+    for n in range(len(T)):
+        e1 = m1 = e2 = m2 = m4 =0
     
-    for i in range(equilibrium): #loops to equilibrate the system
-        metropolis(config, T[n]) #metropolis algorithm
+        config = initial(N)
+    
+        for i in range(equilibrium): #loops to equilibrate the system
+            metropolis(config, T[n]) #metropolis algorithm
 
-    for i in range(sweeps): 
-        metropolis(config, T[n])
+        for i in range(sweeps): 
+            metropolis(config, T[n])
         
-        En = energy(config) 
-        Mag = magnetization(config) 
+            En = energy(config) 
+            Mag = magnetization(config) 
 
-        e1+=En
-        m1+=Mag
-        m2+=Mag**2 
-        e2+=En**2
-        m4+=Mag**4
+            e1+=En
+            m1+=Mag
+            m2+=Mag**2 
+            e2+=En**2
+            m4+=Mag**4
 
-    E[n] = e1/norm1
-    M[n] = m1/norm1
-    Cb[n] = (e2/norm1 - e1**2/norm2)/(kb*T[n]**2)
-    Khi[n] = (m2/norm1 - m1**2/norm2)/(kb*T[n])
-    Ul=1-m4/(norm1**4*3*m2**2/norm2)
-    if N==8:
-        U[0,n]=Ul
-    elif N==16:
-        U[1,n]=Ul
-    elif N==32:
-        U[2,n]=Ul
+        E[n] = e1/norm1
+        M[n] = m1/norm1
+        Cb[n] = (e2/norm1 - e1**2/norm2)/(kb*T[n]**2)
+        Khi[n] = (m2/norm1 - m1**2/norm2)/(kb*T[n])
+        U[n]=1-m4/(3*m2**2)
         
-        
+    return E,M,Cb,Khi,U
+
+T= np.linspace(1, 5, 30)
+N=np.array([8,16,32])
+
+E = np.zeros((len(N),len(T)))
+M,Cb,Khi,U = np.zeros(E.shape), np.zeros(E.shape), np.zeros(E.shape), np.zeros(E.shape)
+
+for k in range(len(N)):
+    E[k,:],M[k,:],Cb[k,:],Khi[k,:],U[k,:]=ising(N[k],T)     
+ 
 ##############
 #Plots
 ##############
 
 
 plt.figure(1)
-plt.plot(T,abs(M),"co")
-plt.xlabel("Temperature (T)") 
-plt.ylabel("Order parameter")
-plt.title("N="+str(N)+", sweeps = equilibriate sweeps ="+str(sweeps))
-plt.savefig("Magnetization"+str(N)+".jpg")
-
-plt.figure(2)
-plt.plot(T,Khi,"bo")
-plt.xlabel("Temperature (T)") 
-plt.ylabel("Susceptibility (Khi)")
-plt.title("N="+str(N)+", sweeps = equilibriate sweeps ="+str(sweeps))
-plt.savefig("Susceptibility"+str(N)+".jpg")
-
-plt.figure(3)
-plt.plot(T,Cb,"ro")
-plt.xlabel("Temperature (T)") 
-plt.ylabel("Specific heat (Cb)")
-plt.title("N="+str(N)+", sweeps = equilibriate sweeps ="+str(sweeps))
-plt.savefig("Specheat"+str(N)+".jpg")
-
-
-plt.figure(4)
-plt.plot(T,U[0,:],"y-",label="N=8")
-plt.plot(T,U[1,:],"g-",label="N=16")
-plt.plot(T,U[2,:],"b-",label="N=32")
+for i in range(len(N)):
+    plt.plot(T,abs(M[i,:]),label="N="+str(N[i]))
 plt.legend()
 plt.xlabel("Temperature (T)") 
-plt.ylabel("Fourth order cumulant (Ul)")
+plt.ylabel("Order parameter")
+plt.savefig("Magnetization.jpg")
+plt.title("sweeps = equilibriate sweeps ="+str(sweeps))
+
+plt.figure(2)
+for i in range(len(N)):
+    plt.plot(T,Khi[i,:],label="N="+str(N[i]))
+plt.legend()
+plt.xlabel("Temperature (T)") 
+plt.ylabel("Susceptibility (Khi)")
+plt.title("sweeps = equilibriate sweeps ="+str(sweeps))
+plt.savefig("Susceptibility.jpg")
+
+plt.figure(3)
+for i in range(len(N)):
+    plt.plot(T,Cb[i,:],label="N="+str(N[i]))
+plt.legend()
+plt.xlabel("Temperature (T)") 
+plt.ylabel("Specific heat (Cb)")
+plt.title("sweeps = equilibriate sweeps ="+str(sweeps))
+plt.savefig("Specheat.jpg")
+
+plt.figure(4)
+for i in range(len(N)):
+    plt.plot(T,U[i,:],label="N="+str(N[i]))
+plt.legend()
+plt.xlabel("Temperature (T)") 
+plt.ylabel("Fourth order cumulant")
+plt.title("sweeps = equilibriate sweeps ="+str(sweeps))
+plt.savefig("Cumulant.jpg")
 
 
