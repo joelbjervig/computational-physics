@@ -43,15 +43,12 @@ def magnetization(config):
     return mag
 
 
+
 ################
 #Main Code
 ###############
 
 def ising(N,T):
-    kb=1
-    J=1      
-    equilibrium = 1000 
-    sweeps = 1000
 
     E,M,Cb,Khi,U = np.zeros(T.shape), np.zeros(T.shape), np.zeros(T.shape), np.zeros(T.shape), np.zeros(T.shape)
     
@@ -87,14 +84,18 @@ def ising(N,T):
         
     return E,M,Cb,Khi,U
 
-T= np.linspace(1, 5, 30)
+kb=1
+J=1      
+equilibrium = 300 
+sweeps = 300
+T= np.linspace(1, 3, 70)
 N=np.array([8,16,32])
 
 E = np.zeros((len(N),len(T)))
 M,Cb,Khi,U = np.zeros(E.shape), np.zeros(E.shape), np.zeros(E.shape), np.zeros(E.shape)
 
 for k in range(len(N)):
-    E[k,:],M[k,:],Cb[k,:],Khi[k,:],U[k,:]=ising(N[k],T)     
+    E[k,:],M[k,:],Cb[k,:],Khi[k,:],U[k,:]=ising(N[k],T)  
  
 ##############
 #Plots
@@ -103,7 +104,7 @@ for k in range(len(N)):
 
 plt.figure(1)
 for i in range(len(N)):
-    plt.plot(T,abs(M[i,:]),label="N="+str(N[i]))
+    plt.plot(T,abs(M[i,:]),"+",label="N="+str(N[i]))
 plt.legend()
 plt.xlabel("Temperature (T)") 
 plt.ylabel("Order parameter")
@@ -112,7 +113,7 @@ plt.title("sweeps = equilibriate sweeps ="+str(sweeps))
 
 plt.figure(2)
 for i in range(len(N)):
-    plt.plot(T,Khi[i,:],label="N="+str(N[i]))
+    plt.plot(T,Khi[i,:],"+",label="N="+str(N[i]))
 plt.legend()
 plt.xlabel("Temperature (T)") 
 plt.ylabel("Susceptibility (Khi)")
@@ -121,7 +122,7 @@ plt.savefig("Susceptibility.jpg")
 
 plt.figure(3)
 for i in range(len(N)):
-    plt.plot(T,Cb[i,:],label="N="+str(N[i]))
+    plt.plot(T,Cb[i,:],"+",label="N="+str(N[i]))
 plt.legend()
 plt.xlabel("Temperature (T)") 
 plt.ylabel("Specific heat (Cb)")
@@ -130,11 +131,9 @@ plt.savefig("Specheat.jpg")
 
 plt.figure(4)
 for i in range(len(N)):
-    plt.plot(T,U[i,:],label="N="+str(N[i]))
+    plt.plot(T,U[i,:],"+",label="N="+str(N[i]))
 plt.legend()
 plt.xlabel("Temperature (T)") 
 plt.ylabel("Fourth order cumulant")
 plt.title("sweeps = equilibriate sweeps ="+str(sweeps))
 plt.savefig("Cumulant.jpg")
-
-
